@@ -3,6 +3,7 @@ package com.study.event.api.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -31,8 +32,15 @@ public class SecurityConfig {
                 .csrf().disable()
                 .httpBasic().disable()
                 .formLogin().disable()
+                // 세션 인증은 더 이상 사용하지 않음
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
                 .authorizeRequests()
-                .antMatchers("/**").permitAll()
+                // 아래의 URL 요청은 모두 허용
+                .antMatchers("/", "/auth/**").permitAll()
+                // 나머지 요청은 전부 인증(로그인) 후 진행해라
+                .anyRequest().authenticated() // 인가 설정 on
         ;
 
         return http.build();
